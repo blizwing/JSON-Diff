@@ -5,270 +5,353 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JSON Diff — Side-by-Side</title>
 <style>
-:root{--bg:#0b0f14;--panel:#121821;--muted:#94a3b8;--fg:#e2e8f0;--accent:#60a5fa;--good:#10b981;--bad:#ef4444;--warn:#f59e0b;--code:#0b1220}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
-header{position:sticky;top:0;background:linear-gradient(180deg,#0b0f14,rgba(11,15,20,.85));backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid #1f2937;z-index:5}
-header .wrap{max-width:1200px;margin:0 auto;padding:14px 16px;display:flex;gap:12px;align-items:center;justify-content:space-between}
-header h1{font-size:18px;margin:0;font-weight:700}
-header .sub{font-size:12px;color:var(--muted)}
-main{max-width:1200px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.col{display:flex;flex-direction:column;gap:8px}
-.panel{background:var(--panel);border:1px solid #1f2937;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-.panel h2{font-size:14px;font-weight:600;margin:0;padding:12px 12px 0}
-textarea{width:100%;min-height:320px;background:#0b1220;color:#dbeafe;border:1px solid #243042;border-radius:12px;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.45;resize:vertical;tab-size:2}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:8px}
-button,label.btn{border:1px solid #283548;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:8px 10px;font-size:12px;cursor:pointer}
-button:hover,.btn:hover{border-color:#334155}
-.accent{border-color:#2563eb;background:#0b1730}
-.accent:hover{border-color:#3b82f6}
-.controls{grid-column:1/-1}
-.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.switch{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
-.results{grid-column:1/-1}
-.summary{display:flex;gap:12px;flex-wrap:wrap;padding:12px}
-.badge{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid #334155;color:#cbd5e1}
-.ok{background:rgba(16,185,129,.1);border-color:#115e59;color:#34d399}
-.bad{background:rgba(239,68,68,.1);border-color:#7f1d1d;color:#fca5a5}
-.warn{background:rgba(245,158,11,.1);border-color:#7c2d12;color:#fbbf24}
-.list{max-height:560px;overflow:auto;border:1px solid #253244;border-radius:10px;background:#0d1423}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:8px 10px;border-bottom:1px solid #1f2a3c;vertical-align:top}
-th{position:sticky;top:0;background:#0f172a;text-align:left}
-code{background:rgba(15,23,42,.6);padding:2px 6px;border-radius:6px}
-.path{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.uploader{display:flex;gap:8px;align-items:center}
-input[type=file]{display:none}
-.drop{border:1px dashed #2b3a52;border-radius:12px;padding:10px 12px;color:#94a3b8}
-.drop.drag{border-color:#60a5fa;color:#93c5fd}
-tr.row-missingA td:nth-child(2){background:rgba(239,68,68,.14)}
-tr.row-missingB td:nth-child(3){background:rgba(239,68,68,.14)}
-tr.row-diff td:nth-child(2),tr.row-diff td:nth-child(3){background:rgba(245,158,11,.10)}
-tr.row-equal{opacity:.7}
-.note{color:#93c5fd}
-#err{color:var(--bad)}
-.errline{font-size:12px;color:#fca5a5;padding:6px 10px}
-@media (max-width:920px){main{grid-template-columns:1fr}}
+  :root{--bg:#0b0f14;--panel:#121821;--muted:#94a3b8;--fg:#e2e8f0;--accent:#60a5fa;--good:#10b981;--bad:#ef4444;--warn:#f59e0b;--code:#0b1220}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
+  header{position:sticky;top:0;background:linear-gradient(180deg,#0b0f14,rgba(11,15,20,.85));backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid #1f2937;z-index:5}
+  header .wrap{max-width:1200px;margin:0 auto;padding:14px 16px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+  header h1{font-size:18px;margin:0;font-weight:700}
+  header .sub{font-size:12px;color:var(--muted)}
+  main{max-width:1200px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .col{display:flex;flex-direction:column;gap:8px}
+  .panel{background:var(--panel);border:1px solid #1f2937;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .panel h2{font-size:14px;font-weight:600;margin:0;padding:12px 12px 0}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:8px}
+  button, label.btn{border:1px solid #283548;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:8px 10px;font-size:12px;cursor:pointer}
+  button:hover, .btn:hover{border-color:#334155}
+  .accent{border-color:#2563eb;background:#0b1730}
+  .accent:hover{border-color:#3b82f6}
+
+  /* Editors with line numbers */
+  .editor{display:grid;grid-template-columns:auto 1fr;gap:0;border:1px solid #243042;border-radius:12px;margin:8px;background:#0b1220}
+  .gutter{padding:10px 6px 10px 10px;background:#0e1626;color:#93a3b0;border-right:1px solid #1e2a3d;user-select:none;overflow:hidden;border-top-left-radius:12px;border-bottom-left-radius:12px}
+  .gutter .ln{height:1.45em;line-height:1.45em;text-align:right;padding:0 6px;border-radius:6px}
+  .gutter .ln.error{background:rgba(239,68,68,.18);color:#fecaca}
+  textarea.code{width:100%;min-height:320px;background:transparent;color:#dbeafe;border:0;border-top-right-radius:12px;border-bottom-right-radius:12px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.45;resize:vertical;tab-size:2;overflow:auto}
+
+  .uploader{display:flex;gap:8px;align-items:center;padding:8px}
+  input[type=file]{display:none}
+  .drop{border:1px dashed #2b3a52;border-radius:12px;padding:8px 10px;color:#94a3b8}
+  .drop.drag{border-color:#60a5fa;color:#93c5fd}
+
+  .controls{grid-column:1/-1}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .switch{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+  #err{color:var(--bad)}
+
+  .results{grid-column:1/-1}
+  .summary{display:flex;gap:12px;flex-wrap:wrap;padding:12px}
+  .badge{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid #334155;color:#cbd5e1}
+  .ok{background:rgba(16,185,129,.1);border-color:#115e59;color:#34d399}
+  .bad{background:rgba(239,68,68,.1);border-color:#7f1d1d;color:#fca5a5}
+  .warn{background:rgba(245,158,11,.1);border-color:#7c2d12;color:#fbbf24}
+
+  .list{max-height:560px;overflow:auto;border:1px solid #253244;border-radius:10px;background:#0d1423}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{padding:8px 10px;border-bottom:1px solid #1f2a3c;vertical-align:top}
+  th{position:sticky;top:0;background:#0f172a;text-align:left}
+  code{background:rgba(15,23,42,.6);padding:2px 6px;border-radius:6px}
+  .path{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  tr.row-missingA td:nth-child(2){background:rgba(239,68,68,.14)}
+  tr.row-missingB td:nth-child(3){background:rgba(239,68,68,.14)}
+  tr.row-diff td:nth-child(2), tr.row-diff td:nth-child(3){background:rgba(245,158,11,.10)}
+  tr.row-equal{opacity:.7}
+
+  footer{max-width:1200px;margin:0 auto;padding:20px 16px;color:var(--muted);font-size:12px}
+  @media (max-width:920px){main{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <div>
-      <h1>JSON Diff — Side-by-Side</h1>
-      <div class="sub">Paste or upload two JSON docs. If not identical, see a row-per-path A vs B table with missing and mismatched highlights.</div>
+  <header>
+    <div class="wrap">
+      <div>
+        <h1>JSON Diff — Side-by-Side</h1>
+        <div class="sub">Paste or upload two JSON docs. If not identical, see a row-per-path A vs B table with missing and mismatched highlights.</div>
+      </div>
+      <div class="toolbar">
+        <button id="btnExamples">Load Example</button>
+        <button id="btnSwap">Swap ⟷</button>
+        <button id="btnPretty">Pretty Format</button>
+        <button class="accent" id="btnCompare">Compare ▶</button>
+        <button id="btnSelfTest" title="Run built-in tests">Run Self Tests</button>
+      </div>
     </div>
-    <div class="toolbar">
-      <button id="btnExamples">Load Example</button>
-      <button id="btnSwap">Swap ⟷</button>
-      <button id="btnPretty">Pretty Format</button>
-      <button class="accent" id="btnCompare">Compare ▶</button>
+  </header>
+
+  <main>
+    <div class="col panel">
+      <h2>Left JSON (A)</h2>
+      <div class="uploader toolbar">
+        <label class="btn"><input type="file" id="fileA" accept=".json,application/json" />Upload A</label>
+        <div class="drop" id="dropA">Drop file here</div>
+      </div>
+      <div class="editor" id="edA">
+        <div class="gutter" id="gutA"></div>
+        <textarea class="code" id="taA" placeholder="Paste JSON A here" spellcheck="false"></textarea>
+      </div>
     </div>
-  </div>
-</header>
-<main>
-  <div class="col panel">
-    <h2>Left JSON (A)</h2>
-    <div class="uploader toolbar">
-      <label class="btn"><input type="file" id="fileA" accept=".json,application/json" />Upload A</label>
-      <div class="drop" id="dropA">Drop file here</div>
+
+    <div class="col panel">
+      <h2>Right JSON (B)</h2>
+      <div class="uploader toolbar">
+        <label class="btn"><input type="file" id="fileB" accept=".json,application/json" />Upload B</label>
+        <div class="drop" id="dropB">Drop file here</div>
+      </div>
+      <div class="editor" id="edB">
+        <div class="gutter" id="gutB"></div>
+        <textarea class="code" id="taB" placeholder="Paste JSON B here" spellcheck="false"></textarea>
+      </div>
     </div>
-    <textarea id="taA" placeholder="Paste JSON A here"></textarea>
-  </div>
-  <div class="col panel">
-    <h2>Right JSON (B)</h2>
-    <div class="uploader toolbar">
-      <label class="btn"><input type="file" id="fileB" accept=".json,application/json" />Upload B</label>
-      <div class="drop" id="dropB">Drop file here</div>
+
+    <div class="panel controls">
+      <div class="row toolbar">
+        <label class="switch"><input type="checkbox" id="cbSort"/> Sort object keys before comparing</label>
+        <label class="switch"><input type="checkbox" id="cbArraysAsSets"/> Treat arrays as sets</label>
+        <label class="switch"><input type="checkbox" id="cbStrictTypes" checked/> Strict type checking</label>
+        <button id="btnDownload">Download Report (JSON)</button>
+        <span id="err"></span>
+      </div>
     </div>
-    <textarea id="taB" placeholder="Paste JSON B here"></textarea>
-  </div>
-  <div class="panel controls">
-    <div class="row toolbar">
-      <label class="switch"><input type="checkbox" id="cbSort"/> Sort object keys before comparing</label>
-      <label class="switch"><input type="checkbox" id="cbArraysAsSets"/> Treat arrays as sets</label>
-      <label class="switch"><input type="checkbox" id="cbStrictTypes" checked/> Strict type checking</label>
-      <button id="btnDownload">Download Report (JSON)</button>
-      <span id="err"></span>
+
+    <div class="panel results">
+      <div class="summary" id="summary"></div>
+      <div class="list">
+        <table id="tblSide">
+          <thead>
+            <tr>
+              <th style="width:38%">Path</th>
+              <th style="width:31%">A</th>
+              <th style="width:31%">B</th>
+              <th style="width:8%">Note</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
-  </div>
-  <div class="panel results">
-    <div class="summary" id="summary"></div>
-    <div class="list">
-      <table id="tblSide">
-        <thead><tr><th>Path</th><th>A</th><th>B</th><th>Note</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-</main>
-<footer>
-  Pro tip: enable "Sort object keys" to ignore key order differences.
-</footer>
+  </main>
+
+  <footer>
+    Pro tip: enable "Sort object keys" to ignore key order differences; use arrays-as-sets for order-insensitive array comparison.
+  </footer>
+
 <script>
-// ---------- Utilities ----------
-const el = sel => document.querySelector(sel);
-const pretty = v => typeof v === 'string' ? v : JSON.stringify(v, null, 2);
-const short = v => { const s = typeof v === 'string' ? v : JSON.stringify(v); return s && s.length > 160 ? s.slice(0,157) + '…' : (s || ''); };
-const isObj = v => Object.prototype.toString.call(v) === '[object Object]';
-function sortKeysDeep(x){ if(Array.isArray(x)) return x.map(sortKeysDeep); if(isObj(x)){ const out = {}; Object.keys(x).sort().forEach(k=>{ out[k] = sortKeysDeep(x[k]); }); return out; } return x; }
-function arraysEqualOrdered(a,b){ if(a.length !== b.length) return false; for(let i=0;i<a.length;i++){ if(JSON.stringify(a[i]) !== JSON.stringify(b[i])) return false; } return true; }
-function arraysEqualAsSetsShallow(a,b){ if(a.length !== b.length) return false; const norm = arr => arr.map(v => (isObj(v) || Array.isArray(v)) ? JSON.stringify(v) : String(v)).sort(); const aa = norm(a), bb = norm(b); for(let i=0;i<aa.length;i++){ if(aa[i] !== bb[i]) return false; } return true; }
+  // ---------- Helpers ----------
+  const el = sel => document.querySelector(sel);
+  const pretty = v => typeof v === 'string' ? v : JSON.stringify(v, null, 2);
+  const short = v => { const s = typeof v === 'string' ? v : JSON.stringify(v); return s && s.length > 160 ? s.slice(0,157)+'…' : (s || ''); }
+  const isObj = v => Object.prototype.toString.call(v) === '[object Object]';
 
-// ---------- Parse w/ Location (no regex literals to keep this single-file safe) ----------
-function digitsAfter(msg, startIndex){
-  let j = startIndex; while(j < msg.length && msg[j] === ' ') j++;
-  let k = j; const DIG = '0123456789';
-  while(k < msg.length && DIG.indexOf(msg[k]) !== -1) k++;
-  return k > j ? Number(msg.slice(j, k)) : null;
-}
-function findWord(msg, word){ const i = msg.toLowerCase().indexOf(word.toLowerCase()); return i; }
-function getErrorLocation(text, err){
-  const msg = String(err && err.message || '');
-  let pos = null, line = null, col = null;
-  // Try to find "position N"
-  const ip = findWord(msg, 'position ');
-  if(ip >= 0){ pos = digitsAfter(msg, ip + 'position '.length); }
-  // Try to find "line X column Y"
-  const il = findWord(msg, 'line ');
-  const ic = findWord(msg, 'column ');
-  if(il >= 0){ line = digitsAfter(msg, il + 'line '.length); }
-  if(ic >= 0){ col  = digitsAfter(msg, ic + 'column '.length); }
-  // If we only have pos, compute line/col
-  if(pos != null && (line == null || col == null)){
-    let l = 1, c = 1; for(let i=0;i<pos && i<text.length;i++){ const ch = text[i]; if(ch === '\n'){ l++; c = 1; } else { c++; } }
-    line = l; col = c;
-  }
-  // If we only have line/col, compute pos
-  if((pos == null) && (line != null && col != null)){
-    let p = 0, l = 1, c = 1; for(; p < text.length; p++){ if(l === line && c === col) break; const ch = text[p]; if(ch === '\n'){ l++; c = 1; } else { c++; } }
-    pos = p;
-  }
-  return {pos, line, col, message: msg};
-}
-function focusError(textarea, loc){
-  if(loc && loc.pos != null){
-    try{ textarea.focus(); textarea.setSelectionRange(loc.pos, loc.pos); }catch(e){}
-    const style = getComputedStyle(textarea); const lh = parseFloat(style.lineHeight)||18; const top = Math.max(0, ((loc.line||1) - 1) * lh - textarea.clientHeight/2); textarea.scrollTop = top;
-  }
-}
+  function sortKeysDeep(x){ if(Array.isArray(x)) return x.map(sortKeysDeep); if(isObj(x)){ const out = {}; Object.keys(x).sort().forEach(k=>{ out[k] = sortKeysDeep(x[k]); }); return out; } return x; }
+  function arraysEqualOrdered(a,b){ if(a.length !== b.length) return false; for(let i=0;i<a.length;i++){ if(JSON.stringify(a[i]) !== JSON.stringify(b[i])) return false; } return true; }
+  function arraysEqualAsSetsShallow(a,b){ if(a.length !== b.length) return false; const norm = arr => arr.map(v => (isObj(v) || Array.isArray(v)) ? JSON.stringify(v) : String(v)).sort(); const aa = norm(a), bb = norm(b); for(let i=0;i<aa.length;i++){ if(aa[i] !== bb[i]) return false; } return true; }
 
-// ---------- Diff Engine ----------
-function diffJSON(a,b, opts){
-  opts = Object.assign({sort:false, arraysAsSets:false, strictTypes:true}, opts||{});
-  if(opts.sort){ a = sortKeysDeep(structuredClone(a)); b = sortKeysDeep(structuredClone(b)); }
-  const missingInB = [], missingInA = [], diffs = [], arrayDiffs = [];
-  function walk(x,y,path){
-    if(typeof x === 'undefined' && typeof y === 'undefined') return;
-    const tx = Array.isArray(x) ? 'array' : (x===null?'null':typeof x);
-    const ty = Array.isArray(y) ? 'array' : (y===null?'null':typeof y);
-    if(tx !== ty){
-      if(typeof x === 'undefined'){ missingInA.push({path, b:y}); return; }
-      if(typeof y === 'undefined'){ missingInB.push({path, a:x}); return; }
-      if(opts.strictTypes){ diffs.push({path, a:x, b:y, note:'Type mismatch: ' + tx + ' vs ' + ty}); return; }
+  // ---------- Parse location helpers ----------
+  function digitsAfter(msg, startIndex){ let j = startIndex; while(j < msg.length && msg[j] === ' ') j++; let k = j; const DIG = '0123456789'; while(k < msg.length && DIG.indexOf(msg[k]) !== -1) k++; return k > j ? Number(msg.slice(j, k)) : null; }
+  function findWord(msg, word){ return msg.toLowerCase().indexOf(word.toLowerCase()); }
+  function getErrorLocation(text, err){
+    const msg = String(err && err.message || '');
+    let pos=null, line=null, col=null;
+    // Chrome-like: "at position 123"
+    const ip = findWord(msg, 'position ');
+    if(ip>=0){ pos = digitsAfter(msg, ip + 'position '.length); }
+    // Firefox-like: "line 3 column 14"
+    const il = findWord(msg, 'line ');
+    const ic = findWord(msg, 'column ');
+    if(il>=0){ line = digitsAfter(msg, il + 'line '.length); }
+    if(ic>=0){ col = digitsAfter(msg, ic + 'column '.length); }
+    // If we only have pos, compute line/col
+    if(pos!=null && (line==null || col==null)){
+      let l=1,c=1; for(let i=0;i<pos && i<text.length;i++){ const ch=text[i]; if(ch==='\n'){ l++; c=1; } else { c++; } }
+      line=l; col=c;
     }
-    if(Array.isArray(x) && Array.isArray(y)){
-      const equal = opts.arraysAsSets ? arraysEqualAsSetsShallow(x,y) : arraysEqualOrdered(x,y);
-      if(!equal){
-        if(x.length !== y.length){ arrayDiffs.push({path, a:x, b:y, note:'Length ' + x.length + ' vs ' + y.length}); }
-        const max = Math.max(x.length, y.length);
-        for(let i=0;i<max;i++){
-          if(i>=x.length){ missingInA.push({path:path + '[' + i + ']', b:y[i]}); continue; }
-          if(i>=y.length){ missingInB.push({path:path + '[' + i + ']', a:x[i]}); continue; }
-          walk(x[i], y[i], path + '[' + i + ']');
-        }
+    // If we only have line/col, compute pos
+    if((pos==null) && (line!=null && col!=null)){
+      let p=0,l=1,c=1; for(; p<text.length; p++){ if(l===line && c===col) break; const ch=text[p]; if(ch==='\n'){ l++; c=1; } else { c++; } }
+      pos=p;
+    }
+    return {pos,line,col,message:msg};
+  }
+  function focusError(textarea, loc){ if(loc && loc.pos!=null){ try{ textarea.focus(); textarea.setSelectionRange(loc.pos, loc.pos); }catch(e){} const style = getComputedStyle(textarea); const lh = parseFloat(style.lineHeight)||18; const top = Math.max(0, ((loc.line||1)-1)*lh - textarea.clientHeight/2); textarea.scrollTop = top; } }
+
+  // ---------- Diff Engine ----------
+  function diffJSON(a,b, opts){
+    opts = Object.assign({sort:false, arraysAsSets:false, strictTypes:true}, opts||{});
+    if(opts.sort){ a = sortKeysDeep(structuredClone(a)); b = sortKeysDeep(structuredClone(b)); }
+    const missingInB=[], missingInA=[], diffs=[], arrayDiffs=[];
+    function walk(x,y,path){
+      if(typeof x==='undefined' && typeof y==='undefined') return;
+      const tx = Array.isArray(x)?'array':(x===null?'null':typeof x);
+      const ty = Array.isArray(y)?'array':(y===null?'null':typeof y);
+      if(tx!==ty){
+        if(typeof x==='undefined'){ missingInA.push({path, b:y}); return; }
+        if(typeof y==='undefined'){ missingInB.push({path, a:x}); return; }
+        if(opts.strictTypes){ diffs.push({path,a:x,b:y,note:'Type mismatch: '+tx+' vs '+ty}); return; }
       }
-      return;
+      if(Array.isArray(x) && Array.isArray(y)){
+        const equal = opts.arraysAsSets ? arraysEqualAsSetsShallow(x,y) : arraysEqualOrdered(x,y);
+        if(!equal){
+          if(x.length!==y.length){ arrayDiffs.push({path,a:x,b:y,note:'Length '+x.length+' vs '+y.length}); }
+          const max=Math.max(x.length,y.length);
+          for(let i=0;i<max;i++){
+            if(i>=x.length){ missingInA.push({path:`${path}[${i}]`, b:y[i]}); continue; }
+            if(i>=y.length){ missingInB.push({path:`${path}[${i}]`, a:x[i]}); continue; }
+            walk(x[i],y[i],`${path}[${i}]`);
+          }
+        }
+        return;
+      }
+      if(isObj(x) && isObj(y)){
+        const keys = new Set([...Object.keys(x), ...Object.keys(y)]);
+        keys.forEach(k=>{
+          if(!(k in y)){ missingInB.push({path: path?`${path}.${k}`:k, a:x[k]}); return; }
+          if(!(k in x)){ missingInA.push({path: path?`${path}.${k}`:k, b:y[k]}); return; }
+          walk(x[k],y[k], path?`${path}.${k}`:k);
+        });
+        return;
+      }
+      if(JSON.stringify(x)!==JSON.stringify(y)){
+        diffs.push({path,a:x,b:y,note:'Value differs'});
+      }
     }
-    if(isObj(x) && isObj(y)){
-      const keys = new Set(Object.keys(x).concat(Object.keys(y)));
-      keys.forEach(function(k){
-        if(!(k in y)) { missingInB.push({path: path? (path + '.' + k) : k, a:x[k]}); return; }
-        if(!(k in x)) { missingInA.push({path: path? (path + '.' + k) : k, b:y[k]}); return; }
-        walk(x[k], y[k], path? (path + '.' + k) : k);
-      });
-      return;
-    }
-    if(JSON.stringify(x) !== JSON.stringify(y)){
-      diffs.push({path, a:x, b:y, note:'Value differs'});
-    }
+    walk(a,b,'');
+    const identical = missingInA.length===0 && missingInB.length===0 && diffs.length===0 && arrayDiffs.length===0;
+    return {identical, missingInA, missingInB, diffs, arrayDiffs};
   }
-  walk(a,b,'');
-  const identical = missingInA.length===0 && missingInB.length===0 && diffs.length===0 && arrayDiffs.length===0;
-  return {identical, missingInA, missingInB, diffs, arrayDiffs};
-}
 
-// ---------- Rendering ----------
-function renderSummary(out){
-  const s = el('#summary'); s.innerHTML = '';
-  const add = function(cls, text){ const b=document.createElement('div'); b.className='badge ' + cls; b.textContent=text; s.appendChild(b); };
-  add(out.identical? 'ok' : 'bad', out.identical? 'Identical ✓' : 'Not identical ✗');
-  add(out.missingInB.length? 'warn':'ok', 'Missing in B: ' + out.missingInB.length);
-  add(out.missingInA.length? 'warn':'ok', 'Missing in A: ' + out.missingInA.length);
-  add(out.diffs.length? 'bad':'ok', 'Value/Type diffs: ' + out.diffs.length);
-  add(out.arrayDiffs.length? 'warn':'ok', 'Array diffs: ' + out.arrayDiffs.length);
-}
-function renderSideBySide(report){
-  const tbody = document.querySelector('#tblSide tbody'); tbody.innerHTML = '';
-  const rows = []; var push = function(cls, path, a, b, note){ rows.push({cls:cls, path: path || '(root)', a:a, b:b, note:note}); };
-  report.diffs.forEach(function(d){ push('row-diff', d.path, d.a, d.b, d.note||'diff'); });
-  report.arrayDiffs.forEach(function(d){ push('row-diff', d.path, d.a, d.b, d.note||'array'); });
-  report.missingInB.forEach(function(d){ push('row-missingB', d.path, d.a, undefined, 'missing in B'); });
-  report.missingInA.forEach(function(d){ push('row-missingA', d.path, undefined, d.b, 'missing in A'); });
-  if(report.identical){ push('row-equal', '(all)', '—', '—', 'identical'); }
-  const frag = document.createDocumentFragment();
-  rows.forEach(function(r){
-    const tr = document.createElement('tr'); tr.className = r.cls;
-    const tdPath = document.createElement('td'); tdPath.innerHTML = '<span class="path">' + r.path + '</span>'; tr.appendChild(tdPath);
-    const tdA = document.createElement('td'); tdA.innerHTML = (typeof r.a === 'undefined')? '<code class="note">(missing)</code>' : '<code title="' + pretty(r.a) + '">' + short(r.a) + '</code>'; tr.appendChild(tdA);
-    const tdB = document.createElement('td'); tdB.innerHTML = (typeof r.b === 'undefined')? '<code class="note">(missing)</code>' : '<code title="' + pretty(r.b) + '">' + short(r.b) + '</code>'; tr.appendChild(tdB);
-    const tdN = document.createElement('td'); tdN.textContent = r.note||''; tr.appendChild(tdN);
-    frag.appendChild(tr);
+  // ---------- Rendering ----------
+  function renderSummary(out){
+    const s = el('#summary'); s.innerHTML='';
+    const add=(cls,text)=>{ const b=document.createElement('div'); b.className=`badge ${cls}`; b.textContent=text; s.appendChild(b); };
+    add(out.identical?'ok':'bad', out.identical?'Identical ✓':'Not identical ✗');
+    add(out.missingInB.length?'warn':'ok', `Missing in B: ${out.missingInB.length}`);
+    add(out.missingInA.length?'warn':'ok', `Missing in A: ${out.missingInA.length}`);
+    add(out.diffs.length?'bad':'ok', `Value/Type diffs: ${out.diffs.length}`);
+    add(out.arrayDiffs.length?'warn':'ok', `Array diffs: ${out.arrayDiffs.length}`);
+  }
+  function renderSideBySide(report){
+    const tbody = document.querySelector('#tblSide tbody'); tbody.innerHTML='';
+    const rows=[]; const push=(cls,path,a,b,note)=>rows.push({cls, path: path||'(root)', a,b,note});
+    report.diffs.forEach(d=>push('row-diff', d.path, d.a, d.b, d.note||'diff'));
+    report.arrayDiffs.forEach(d=>push('row-diff', d.path, d.a, d.b, d.note||'array'));
+    report.missingInB.forEach(d=>push('row-missingB', d.path, d.a, undefined, 'missing in B'));
+    report.missingInA.forEach(d=>push('row-missingA', d.path, undefined, d.b, 'missing in A'));
+    if(report.identical){ push('row-equal', '(all)', '—', '—', 'identical'); }
+    const frag=document.createDocumentFragment();
+    rows.forEach(r=>{
+      const tr=document.createElement('tr'); tr.className=r.cls;
+      const tdPath=document.createElement('td'); tdPath.innerHTML=`<span class="path">${r.path}</span>`; tr.appendChild(tdPath);
+      const tdA=document.createElement('td'); tdA.innerHTML = (typeof r.a==='undefined')? '<code class="note">(missing)</code>' : `<code title="${pretty(r.a)}">${short(r.a)}</code>`; tr.appendChild(tdA);
+      const tdB=document.createElement('td'); tdB.innerHTML = (typeof r.b==='undefined')? '<code class="note">(missing)</code>' : `<code title="${pretty(r.b)}">${short(r.b)}</code>`; tr.appendChild(tdB);
+      const tdN=document.createElement('td'); tdN.textContent=r.note||''; tr.appendChild(tdN);
+      frag.appendChild(tr);
+    });
+    tbody.appendChild(frag);
+  }
+  function download(filename, data){ const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url); }
+
+  // ---------- Editor line numbers ----------
+  function updateLineNumbers(which){
+    const ta = el('#ta'+which); const gut = el('#gut'+which);
+    const lineCount = (ta.value.match(/\n/g)||[]).length + 1;
+    let html=''; for(let i=1;i<=lineCount;i++){ html += `<div class="ln" data-n="${i}">${i}</div>`; }
+    gut.innerHTML = html; syncScroll(which);
+  }
+  function syncScroll(which){ const ta = el('#ta'+which); const gut = el('#gut'+which); gut.scrollTop = ta.scrollTop; }
+  function clearGutterError(which){ const gut = el('#gut'+which); gut.querySelectorAll('.ln.error').forEach(n=>n.classList.remove('error')); }
+  function markGutterError(which, line){ const gut = el('#gut'+which); clearGutterError(which); if(!line) return; const node = gut.querySelector(`.ln[data-n="${line}"]`); if(node) node.classList.add('error'); }
+
+  // ---------- Wiring / actions ----------
+  function getOpts(){ return { sort: el('#cbSort').checked, arraysAsSets: el('#cbArraysAsSets').checked, strictTypes: el('#cbStrictTypes').checked }; }
+  function onCompare(){
+    el('#err').textContent=''; ['A','B'].forEach(w=>{ el('#ta'+w).style.outline=''; clearGutterError(w); });
+    const aText = el('#taA').value, bText = el('#taB').value; let a,b;
+    try{ a = JSON.parse(aText); }catch(eA){ const loc = getErrorLocation(aText, eA); el('#err').textContent = `A parse error: ${loc.message}${loc.line?` (line ${loc.line}, col ${loc.col})`:''}`; el('#taA').style.outline='2px solid var(--bad)'; markGutterError('A', loc.line); focusError(el('#taA'), loc); return; }
+    try{ b = JSON.parse(bText); }catch(eB){ const loc = getErrorLocation(bText, eB); el('#err').textContent = `B parse error: ${loc.message}${loc.line?` (line ${loc.line}, col ${loc.col})`:''}`; el('#taB').style.outline='2px solid var(--bad)'; markGutterError('B', loc.line); focusError(el('#taB'), loc); return; }
+    const out = diffJSON(a,b,getOpts()); renderSummary(out); renderSideBySide(out); window._lastReport = out; }
+  function onPretty(){ ['A','B'].forEach(w=>{ try{ const t = el('#ta'+w); const v = JSON.parse(t.value); t.value = JSON.stringify(v,null,2); updateLineNumbers(w); }catch{} }); }
+  function onSwap(){ const a = el('#taA').value; const b = el('#taB').value; el('#taA').value = b; el('#taB').value = a; ['A','B'].forEach(updateLineNumbers); }
+  function onDownload(){ if(!window._lastReport){ onCompare(); } if(window._lastReport){ download('json-diff-report.json', window._lastReport); } }
+  function attachFileInput(input, ta){ input.addEventListener('change', async e => { const f = e.target.files?.[0]; if(!f) return; const text = await f.text(); ta.value = text; const which = ta.id.endsWith('A') ? 'A' : 'B'; updateLineNumbers(which); }); }
+  function attachDropZone(zone, ta){ ['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev, e=>{e.preventDefault(); zone.classList.add('drag');})); ['dragleave','drop'].forEach(ev=>zone.addEventListener(ev, e=>{e.preventDefault(); zone.classList.remove('drag');})); zone.addEventListener('drop', async e=>{ const f = e.dataTransfer.files?.[0]; if(!f) return; const text = await f.text(); ta.value=text; const which = ta.id.endsWith('A') ? 'A' : 'B'; updateLineNumbers(which); }); }
+  function loadExample(){ const J1 = JSON.stringify({name:'Alice', age:25, skills:['JS','Python'], address:{city:'Wonderland'}}, null, 2); const J2 = JSON.stringify({name:'Alice', age:26, skills:['JS','Python','Go'], address:{city:'Wonderland', zip:'12345'}}, null, 2); el('#taA').value = J1; el('#taB').value = J2; ['A','B'].forEach(updateLineNumbers); }
+
+  // ---------- Self tests ----------
+  function selfTests(){
+    const tests = [];
+    const push = (name, fn) => tests.push({name, fn});
+    const eq = (a,b) => JSON.stringify(a)===JSON.stringify(b);
+
+    // 1) Identical simple objects
+    push('identical objects', ()=>{
+      const a={x:1,y:2}, b={x:1,y:2};
+      const r = diffJSON(a,b,{});
+      if(!r.identical) throw new Error('Expected identical');
+    });
+
+    // 2) Missing key in B
+    push('missing in B', ()=>{
+      const a={x:1,y:2}, b={x:1};
+      const r = diffJSON(a,b,{});
+      if(!(r.missingInB.some(d=>d.path==='y'))) throw new Error('Expected y missing in B');
+    });
+
+    // 3) Value difference
+    push('value difference', ()=>{
+      const a={x:1}, b={x:2};
+      const r = diffJSON(a,b,{});
+      if(!(r.diffs.length===1 && r.diffs[0].path==='x')) throw new Error('Expected diff at x');
+    });
+
+    // 4) Arrays as sets
+    push('arrays as sets equality', ()=>{
+      const a=[1,2,3], b=[3,2,1];
+      const r = diffJSON(a,b,{arraysAsSets:true});
+      if(!r.identical) throw new Error('Expected arrays identical as sets');
+    });
+
+    // 5) Type mismatch when strict
+    push('type mismatch strict', ()=>{
+      const a={x:'1'}, b={x:1};
+      const r = diffJSON(a,b,{strictTypes:true});
+      if(!(r.diffs.some(d=>d.path==='x' && d.note.indexOf('Type mismatch')>=0))) throw new Error('Expected type mismatch');
+    });
+
+    // Run tests
+    const results = [];
+    let failed = 0;
+    tests.forEach(t=>{
+      try{ t.fn(); results.push({name:t.name, ok:true}); }
+      catch(e){ failed++; results.push({name:t.name, ok:false, msg:e.message}); }
+    });
+
+    alert(results.map(r=>`${r.ok?'✅':'❌'} ${r.name}${r.ok?'':(' — '+r.msg)}`).join('\n'));
+    return {failed, results};
+  }
+
+  // Init
+  document.addEventListener('DOMContentLoaded', ()=>{
+    // Buttons
+    el('#btnCompare').addEventListener('click', onCompare);
+    el('#btnPretty').addEventListener('click', onPretty);
+    el('#btnSwap').addEventListener('click', onSwap);
+    el('#btnDownload').addEventListener('click', onDownload);
+    el('#btnExamples').addEventListener('click', loadExample);
+    el('#btnSelfTest').addEventListener('click', selfTests);
+    // Editors: input & scroll sync
+    ['A','B'].forEach(w=>{
+      const ta = el('#ta'+w);
+      ta.addEventListener('input', ()=>{ updateLineNumbers(w); el('#err').textContent=''; ta.style.outline=''; clearGutterError(w); });
+      ta.addEventListener('scroll', ()=> syncScroll(w));
+      updateLineNumbers(w);
+    });
+    // Upload / Drop
+    attachFileInput(el('#fileA'), el('#taA'));
+    attachFileInput(el('#fileB'), el('#taB'));
+    attachDropZone(el('#dropA'), el('#taA'));
+    attachDropZone(el('#dropB'), el('#taB'));
   });
-  tbody.appendChild(frag);
-}
-function download(filename, data){ const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url); }
-
-// ---------- Wiring ----------
-function getOpts(){ return { sort: el('#cbSort').checked, arraysAsSets: el('#cbArraysAsSets').checked, strictTypes: el('#cbStrictTypes').checked }; }
-function onCompare(){
-  el('#err').textContent = '';
-  el('#taA').style.outline = '';
-  el('#taB').style.outline = '';
-  try{
-    const aText = el('#taA').value;
-    const bText = el('#taB').value;
-    let a, b;
-    try{ a = JSON.parse(aText); }
-    catch(eA){ const loc = getErrorLocation(aText, eA); el('#err').textContent = 'A parse error: ' + loc.message + (loc.line? ' (line ' + loc.line + ', col ' + loc.col + ')' : ''); el('#taA').style.outline = '2px solid var(--bad)'; focusError(el('#taA'), loc); return; }
-    try{ b = JSON.parse(bText); }
-    catch(eB){ const loc = getErrorLocation(bText, eB); el('#err').textContent = 'B parse error: ' + loc.message + (loc.line? ' (line ' + loc.line + ', col ' + loc.col + ')' : ''); el('#taB').style.outline = '2px solid var(--bad)'; focusError(el('#taB'), loc); return; }
-    const out = diffJSON(a,b,getOpts());
-    renderSummary(out);
-    renderSideBySide(out);
-    window._lastReport = out;
-  }catch(e){
-    el('#err').textContent = 'Unexpected error: ' + e.message;
-  }
-}
-function onPretty(){ ['#taA','#taB'].forEach(function(id){ try{ const v = JSON.parse(el(id).value); el(id).value = JSON.stringify(v,null,2); }catch(e){} }); }
-function onSwap(){ const a = el('#taA').value; const b = el('#taB').value; el('#taA').value = b; el('#taB').value = a; }
-function onDownload(){ if(!window._lastReport){ onCompare(); } if(window._lastReport){ download('json-diff-report.json', window._lastReport); } }
-function attachFileInput(input, ta){ input.addEventListener('change', function(e){ const f = e.target.files && e.target.files[0]; if(!f) return; f.text().then(function(text){ ta.value = text; }); }); }
-function attachDropZone(zone, ta){ ['dragenter','dragover'].forEach(function(ev){ zone.addEventListener(ev, function(e){ e.preventDefault(); zone.classList.add('drag'); }); }); ['dragleave','drop'].forEach(function(ev){ zone.addEventListener(ev, function(e){ e.preventDefault(); zone.classList.remove('drag'); }); }); zone.addEventListener('drop', function(e){ const f = e.dataTransfer.files && e.dataTransfer.files[0]; if(!f) return; f.text().then(function(text){ ta.value = text; }); }); }
-function loadExample(){ const J1 = JSON.stringify({name:'Alice', age:25, skills:['JS','Python'], address:{city:'Wonderland'}}, null, 2); const J2 = JSON.stringify({name:'Alice', age:26, skills:['JS','Python','Go'], address:{city:'Wonderland', zip:'12345'}}, null, 2); el('#taA').value = J1; el('#taB').value = J2; }
-['#taA','#taB'].forEach(function(sel){ const t = el(sel); t.addEventListener('input', function(){ t.style.outline=''; el('#err').textContent=''; }); });
-document.addEventListener('DOMContentLoaded', function(){
-  el('#btnCompare').addEventListener('click', onCompare);
-  el('#btnPretty').addEventListener('click', onPretty);
-  el('#btnSwap').addEventListener('click', onSwap);
-  el('#btnDownload').addEventListener('click', onDownload);
-  el('#btnExamples').addEventListener('click', loadExample);
-  attachFileInput(el('#fileA'), el('#taA'));
-  attachFileInput(el('#fileB'), el('#taB'));
-  attachDropZone(el('#dropA'), el('#taA'));
-  attachDropZone(el('#dropB'), el('#taB'));
-});
 </script>
 </body>
 </html>

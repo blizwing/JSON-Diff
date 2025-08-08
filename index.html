@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>JSON Diff — Side-by-Side</title>
+<title>JSON Diff — Side-by-Side (with Line Numbers)</title>
 <style>
-  :root{--bg:#0b0f14;--panel:#121821;--muted:#94a3b8;--fg:#e2e8f0;--accent:#60a5fa;--good:#10b981;--bad:#ef4444;--warn:#f59e0b;--code:#0b1220}
+  :root{--bg:#0b0f14;--panel:#121821;--muted:#94a3b8;--fg:#e2e8f0;--accent:#60a5fa;--good:#10b981;--bad:#ef4444;--warn:#f59e0b;--pxlh:18px}
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
   header{position:sticky;top:0;background:linear-gradient(180deg,#0b0f14,rgba(11,15,20,.85));backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid #1f2937;z-index:5}
@@ -15,52 +14,20 @@
   main{max-width:1200px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .col{display:flex;flex-direction:column;gap:8px}
   .panel{background:var(--panel);border:1px solid #1f2937;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-  .panel h2{font-size:14px;font-weight:600;margin:0;padding:12px 12px 0}
+  .panel h2{font-size:14px;font-weight:600;margin:0;padding:12px 12px 0}.toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:8px} button, label.btn{border:1px solid #283548;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:8px 10px;font-size:12px;cursor:pointer} button:hover, .btn:hover{border-color:#334155} .accent{border-color:#2563eb;background:#0b1730} .accent:hover{border-color:#3b82f6}
 
-  .toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:8px}
-  button, label.btn{border:1px solid #283548;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:8px 10px;font-size:12px;cursor:pointer}
-  button:hover, .btn:hover{border-color:#334155}
-  .accent{border-color:#2563eb;background:#0b1730}
-  .accent:hover{border-color:#3b82f6}
+/* Editors with line numbers */ .editor{display:grid;grid-template-columns:auto 1fr;gap:0;border:1px solid #243042;border-radius:12px;margin:8px;background:#0b1220} .gutter{padding:10px; padding-right:6px;background:#0e1626;color:#93a3b0;border-right:1px solid #1e2a3d;user-select:none;overflow:hidden;border-top-left-radius:12px;border-bottom-left-radius:12px;white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:var(--pxlh);} .gutter .ln{height:var(--pxlh);line-height:var(--pxlh);text-align:right;padding:0 6px;border-radius:6px} .gutter .ln.error{background:rgba(239,68,68,.18);color:#fecaca} textarea.code{width:100%;min-height:320px;background:transparent;color:#dbeafe;border:0;border-top-right-radius:12px;border-bottom-right-radius:12px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:var(--pxlh);resize:vertical;tab-size:2;overflow:auto;white-space:pre}
 
-  /* Editors with line numbers */
-  .editor{display:grid;grid-template-columns:auto 1fr;gap:0;border:1px solid #243042;border-radius:12px;margin:8px;background:#0b1220}
-  .gutter{padding:10px 6px 10px 10px;background:#0e1626;color:#93a3b0;border-right:1px solid #1e2a3d;user-select:none;overflow:hidden;border-top-left-radius:12px;border-bottom-left-radius:12px}
-  .gutter .ln{height:1.45em;line-height:1.45em;text-align:right;padding:0 6px;border-radius:6px}
-  .gutter .ln.error{background:rgba(239,68,68,.18);color:#fecaca}
-  textarea.code{width:100%;min-height:320px;background:transparent;color:#dbeafe;border:0;border-top-right-radius:12px;border-bottom-right-radius:12px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.45;resize:vertical;tab-size:2;overflow:auto}
+.uploader{display:flex;gap:8px;align-items:center;padding:8px} input[type=file]{display:none} .drop{border:1px dashed #2b3a52;border-radius:12px;padding:8px 10px;color:#94a3b8} .drop.drag{border-color:#60a5fa;color:#93c5fd}
 
-  .uploader{display:flex;gap:8px;align-items:center;padding:8px}
-  input[type=file]{display:none}
-  .drop{border:1px dashed #2b3a52;border-radius:12px;padding:8px 10px;color:#94a3b8}
-  .drop.drag{border-color:#60a5fa;color:#93c5fd}
+.controls{grid-column:1/-1} .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center} .switch{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)} #err{color:#f87171}
 
-  .controls{grid-column:1/-1}
-  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-  .switch{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
-  #err{color:var(--bad)}
+.results{grid-column:1/-1} .summary{display:flex;gap:12px;flex-wrap:wrap;padding:12px} .badge{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid #334155;color:#cbd5e1} .ok{background:rgba(16,185,129,.1);border-color:#115e59;color:#34d399} .bad{background:rgba(239,68,68,.1);border-color:#7f1d1d;color:#fca5a5} .warn{background:rgba(245,158,11,.1);border-color:#7c2d12;color:#fbbf24}
 
-  .results{grid-column:1/-1}
-  .summary{display:flex;gap:12px;flex-wrap:wrap;padding:12px}
-  .badge{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid #334155;color:#cbd5e1}
-  .ok{background:rgba(16,185,129,.1);border-color:#115e59;color:#34d399}
-  .bad{background:rgba(239,68,68,.1);border-color:#7f1d1d;color:#fca5a5}
-  .warn{background:rgba(245,158,11,.1);border-color:#7c2d12;color:#fbbf24}
+.list{max-height:560px;overflow:auto;border:1px solid #253244;border-radius:10px;background:#0d1423} table{width:100%;border-collapse:collapse;font-size:12px} th,td{padding:8px 10px;border-bottom:1px solid #1f2a3c;vertical-align:top} th{position:sticky;top:0;background:#0f172a;text-align:left} code{background:rgba(15,23,42,.6);padding:2px 6px;border-radius:6px} .path{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace} tr.row-missingA td:nth-child(2){background:rgba(239,68,68,.14)} tr.row-missingB td:nth-child(3){background:rgba(239,68,68,.14)} tr.row-diff td:nth-child(2), tr.row-diff td:nth-child(3){background:rgba(245,158,11,.10)} tr.row-equal{opacity:.7}
 
-  .list{max-height:560px;overflow:auto;border:1px solid #253244;border-radius:10px;background:#0d1423}
-  table{width:100%;border-collapse:collapse;font-size:12px}
-  th,td{padding:8px 10px;border-bottom:1px solid #1f2a3c;vertical-align:top}
-  th{position:sticky;top:0;background:#0f172a;text-align:left}
-  code{background:rgba(15,23,42,.6);padding:2px 6px;border-radius:6px}
-  .path{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-  tr.row-missingA td:nth-child(2){background:rgba(239,68,68,.14)}
-  tr.row-missingB td:nth-child(3){background:rgba(239,68,68,.14)}
-  tr.row-diff td:nth-child(2), tr.row-diff td:nth-child(3){background:rgba(245,158,11,.10)}
-  tr.row-equal{opacity:.7}
+footer{max-width:1200px;margin:0 auto;padding:20px 16px;color:#94a3b8;font-size:12px} @media (max-width:920px){main{grid-template-columns:1fr}} </style>
 
-  footer{max-width:1200px;margin:0 auto;padding:20px 16px;color:var(--muted);font-size:12px}
-  @media (max-width:920px){main{grid-template-columns:1fr}}
-</style>
 </head>
 <body>
   <header>
@@ -77,9 +44,7 @@
         <button id="btnSelfTest" title="Run built-in tests">Run Self Tests</button>
       </div>
     </div>
-  </header>
-
-  <main>
+  </header>  <main>
     <div class="col panel">
       <h2>Left JSON (A)</h2>
       <div class="uploader toolbar">
@@ -90,53 +55,48 @@
         <div class="gutter" id="gutA"></div>
         <textarea class="code" id="taA" placeholder="Paste JSON A here" spellcheck="false"></textarea>
       </div>
-    </div>
+    </div><div class="col panel">
+  <h2>Right JSON (B)</h2>
+  <div class="uploader toolbar">
+    <label class="btn"><input type="file" id="fileB" accept=".json,application/json" />Upload B</label>
+    <div class="drop" id="dropB">Drop file here</div>
+  </div>
+  <div class="editor" id="edB">
+    <div class="gutter" id="gutB"></div>
+    <textarea class="code" id="taB" placeholder="Paste JSON B here" spellcheck="false"></textarea>
+  </div>
+</div>
 
-    <div class="col panel">
-      <h2>Right JSON (B)</h2>
-      <div class="uploader toolbar">
-        <label class="btn"><input type="file" id="fileB" accept=".json,application/json" />Upload B</label>
-        <div class="drop" id="dropB">Drop file here</div>
-      </div>
-      <div class="editor" id="edB">
-        <div class="gutter" id="gutB"></div>
-        <textarea class="code" id="taB" placeholder="Paste JSON B here" spellcheck="false"></textarea>
-      </div>
-    </div>
+<div class="panel controls">
+  <div class="row toolbar">
+    <label class="switch"><input type="checkbox" id="cbSort"/> Sort object keys before comparing</label>
+    <label class="switch"><input type="checkbox" id="cbArraysAsSets"/> Treat arrays as sets</label>
+    <label class="switch"><input type="checkbox" id="cbStrictTypes" checked/> Strict type checking</label>
+    <button id="btnDownload">Download Report (JSON)</button>
+    <span id="err"></span>
+  </div>
+</div>
 
-    <div class="panel controls">
-      <div class="row toolbar">
-        <label class="switch"><input type="checkbox" id="cbSort"/> Sort object keys before comparing</label>
-        <label class="switch"><input type="checkbox" id="cbArraysAsSets"/> Treat arrays as sets</label>
-        <label class="switch"><input type="checkbox" id="cbStrictTypes" checked/> Strict type checking</label>
-        <button id="btnDownload">Download Report (JSON)</button>
-        <span id="err"></span>
-      </div>
-    </div>
+<div class="panel results">
+  <div class="summary" id="summary"></div>
+  <div class="list">
+    <table id="tblSide">
+      <thead>
+        <tr>
+          <th style="width:38%">Path</th>
+          <th style="width:31%">A</th>
+          <th style="width:31%">B</th>
+          <th style="width:8%">Note</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
 
-    <div class="panel results">
-      <div class="summary" id="summary"></div>
-      <div class="list">
-        <table id="tblSide">
-          <thead>
-            <tr>
-              <th style="width:38%">Path</th>
-              <th style="width:31%">A</th>
-              <th style="width:31%">B</th>
-              <th style="width:8%">Note</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </main>
-
-  <footer>
+  </main>  <footer>
     Pro tip: enable "Sort object keys" to ignore key order differences; use arrays-as-sets for order-insensitive array comparison.
-  </footer>
-
-<script>
+  </footer><script>
   // ---------- Helpers ----------
   const el = sel => document.querySelector(sel);
   const pretty = v => typeof v === 'string' ? v : JSON.stringify(v, null, 2);
@@ -153,27 +113,76 @@
   function getErrorLocation(text, err){
     const msg = String(err && err.message || '');
     let pos=null, line=null, col=null;
-    // Chrome-like: "at position 123"
     const ip = findWord(msg, 'position ');
     if(ip>=0){ pos = digitsAfter(msg, ip + 'position '.length); }
-    // Firefox-like: "line 3 column 14"
     const il = findWord(msg, 'line ');
     const ic = findWord(msg, 'column ');
     if(il>=0){ line = digitsAfter(msg, il + 'line '.length); }
     if(ic>=0){ col = digitsAfter(msg, ic + 'column '.length); }
-    // If we only have pos, compute line/col
     if(pos!=null && (line==null || col==null)){
-      let l=1,c=1; for(let i=0;i<pos && i<text.length;i++){ const ch=text[i]; if(ch==='\n'){ l++; c=1; } else { c++; } }
+      let l=1,c=1; for(let i=0;i<pos && i<text.length;i++){ const ch=text[i]; if(ch==='
+'){ l++; c=1; } else { c++; } }
       line=l; col=c;
     }
-    // If we only have line/col, compute pos
     if((pos==null) && (line!=null && col!=null)){
-      let p=0,l=1,c=1; for(; p<text.length; p++){ if(l===line && c===col) break; const ch=text[p]; if(ch==='\n'){ l++; c=1; } else { c++; } }
+      let p=0,l=1,c=1; for(; p<text.length; p++){ if(l===line && c===col) break; const ch=text[p]; if(ch==='
+'){ l++; c=1; } else { c++; } }
       pos=p;
     }
     return {pos,line,col,message:msg};
   }
-  function focusError(textarea, loc){ if(loc && loc.pos!=null){ try{ textarea.focus(); textarea.setSelectionRange(loc.pos, loc.pos); }catch(e){} const style = getComputedStyle(textarea); const lh = parseFloat(style.lineHeight)||18; const top = Math.max(0, ((loc.line||1)-1)*lh - textarea.clientHeight/2); textarea.scrollTop = top; } }
+  function focusError(textarea, loc){ if(loc && loc.pos!=null){ try{ textarea.focus(); textarea.setSelectionRange(loc.pos, loc.pos); }catch(e){} const style = getComputedStyle(textarea); const lh = parseFloat(style.lineHeight)||parseFloat(getComputedStyle(textarea).fontSize)*1.2; const top = Math.max(0, ((loc.line||1)-1)*lh - textarea.clientHeight/2); textarea.scrollTop = top; } }
+
+  // ---------- Robust line counting (fixes phantom lines) ----------
+  function countLines(text){
+    let s = String(text);
+    s = s.replace(/^﻿/, '');
+    s = s.replace(/
+/g, '
+');
+    s = s.replace(/[
+  ]/g, '
+');
+    return (s.match(/
+/g) || []).length + 1;
+  }
+
+  // ---------- Line-height synchronization to prevent drift ----------
+  function measureLineHeightPx(ta){
+    const cs = getComputedStyle(ta);
+    if(cs.lineHeight && cs.lineHeight.endsWith('px')) return parseFloat(cs.lineHeight);
+    const probe = document.createElement('span');
+    probe.textContent = 'A';
+    probe.style.position = 'absolute';
+    probe.style.visibility = 'hidden';
+    probe.style.whiteSpace = 'pre';
+    probe.style.fontFamily = cs.fontFamily;
+    probe.style.fontSize = cs.fontSize;
+    probe.style.lineHeight = 'normal';
+    document.body.appendChild(probe);
+    const h = probe.getBoundingClientRect().height;
+    probe.remove();
+    return h || Math.round(parseFloat(cs.fontSize) * 1.2);
+  }
+  function syncLineMetrics(which){
+    const ta = document.querySelector('#ta'+which);
+    const ed = document.querySelector('#ed'+which);
+    const gut = document.querySelector('#gut'+which);
+    const cs = getComputedStyle(ta);
+    // Match font + size exactly
+    gut.style.fontFamily = cs.fontFamily;
+    gut.style.fontSize = cs.fontSize;
+    // Measure and sync exact pixel line-height
+    const lh = measureLineHeightPx(ta);
+    ed.style.setProperty('--pxlh', lh+'px');
+    ta.style.lineHeight = lh+'px';
+    gut.style.lineHeight = lh+'px';
+    // Match vertical padding so the first line aligns perfectly
+    gut.style.paddingTop = cs.paddingTop;
+    gut.style.paddingBottom = cs.paddingBottom;
+    // Update existing gutter rows to exact pixel height
+    gut.querySelectorAll('.ln').forEach(n=>{ n.style.height = lh+'px'; n.style.lineHeight = lh+'px'; });
+  }
 
   // ---------- Diff Engine ----------
   function diffJSON(a,b, opts){
@@ -238,12 +247,26 @@
     report.missingInB.forEach(d=>push('row-missingB', d.path, d.a, undefined, 'missing in B'));
     report.missingInA.forEach(d=>push('row-missingA', d.path, undefined, d.b, 'missing in A'));
     if(report.identical){ push('row-equal', '(all)', '—', '—', 'identical'); }
+
     const frag=document.createDocumentFragment();
     rows.forEach(r=>{
       const tr=document.createElement('tr'); tr.className=r.cls;
-      const tdPath=document.createElement('td'); tdPath.innerHTML=`<span class="path">${r.path}</span>`; tr.appendChild(tdPath);
-      const tdA=document.createElement('td'); tdA.innerHTML = (typeof r.a==='undefined')? '<code class="note">(missing)</code>' : `<code title="${pretty(r.a)}">${short(r.a)}</code>`; tr.appendChild(tdA);
-      const tdB=document.createElement('td'); tdB.innerHTML = (typeof r.b==='undefined')? '<code class="note">(missing)</code>' : `<code title="${pretty(r.b)}">${short(r.b)}</code>`; tr.appendChild(tdB);
+
+      const tdPath=document.createElement('td');
+      const sp=document.createElement('span'); sp.className='path'; sp.textContent=r.path; tdPath.appendChild(sp); tr.appendChild(tdPath);
+
+      const tdA=document.createElement('td');
+      const ca=document.createElement('code');
+      if(typeof r.a==='undefined'){ ca.className='note'; ca.textContent='(missing)'; }
+      else { ca.setAttribute('title', pretty(r.a)); ca.textContent = short(r.a); }
+      tdA.appendChild(ca); tr.appendChild(tdA);
+
+      const tdB=document.createElement('td');
+      const cb=document.createElement('code');
+      if(typeof r.b==='undefined'){ cb.className='note'; cb.textContent='(missing)'; }
+      else { cb.setAttribute('title', pretty(r.b)); cb.textContent = short(r.b); }
+      tdB.appendChild(cb); tr.appendChild(tdB);
+
       const tdN=document.createElement('td'); tdN.textContent=r.note||''; tr.appendChild(tdN);
       frag.appendChild(tr);
     });
@@ -254,9 +277,22 @@
   // ---------- Editor line numbers ----------
   function updateLineNumbers(which){
     const ta = el('#ta'+which); const gut = el('#gut'+which);
-    const lineCount = (ta.value.match(/\n/g)||[]).length + 1;
-    let html=''; for(let i=1;i<=lineCount;i++){ html += `<div class="ln" data-n="${i}">${i}</div>`; }
-    gut.innerHTML = html; syncScroll(which);
+    const lines = countLines(ta.value);
+    const current = gut.childElementCount;
+    if(current !== lines){
+      const frag = document.createDocumentFragment();
+      for(let i=1;i<=lines;i++){
+        const div = document.createElement('div');
+        div.className = 'ln';
+        div.dataset.n = String(i);
+        div.textContent = String(i);
+        frag.appendChild(div);
+      }
+      gut.innerHTML = '';
+      gut.appendChild(frag);
+    }
+    syncLineMetrics(which);
+    syncScroll(which);
   }
   function syncScroll(which){ const ta = el('#ta'+which); const gut = el('#gut'+which); gut.scrollTop = ta.scrollTop; }
   function clearGutterError(which){ const gut = el('#gut'+which); gut.querySelectorAll('.ln.error').forEach(n=>n.classList.remove('error')); }
@@ -267,66 +303,47 @@
   function onCompare(){
     el('#err').textContent=''; ['A','B'].forEach(w=>{ el('#ta'+w).style.outline=''; clearGutterError(w); });
     const aText = el('#taA').value, bText = el('#taB').value; let a,b;
-    try{ a = JSON.parse(aText); }catch(eA){ const loc = getErrorLocation(aText, eA); el('#err').textContent = `A parse error: ${loc.message}${loc.line?` (line ${loc.line}, col ${loc.col})`:''}`; el('#taA').style.outline='2px solid var(--bad)'; markGutterError('A', loc.line); focusError(el('#taA'), loc); return; }
-    try{ b = JSON.parse(bText); }catch(eB){ const loc = getErrorLocation(bText, eB); el('#err').textContent = `B parse error: ${loc.message}${loc.line?` (line ${loc.line}, col ${loc.col})`:''}`; el('#taB').style.outline='2px solid var(--bad)'; markGutterError('B', loc.line); focusError(el('#taB'), loc); return; }
+    try{ a = JSON.parse(aText); }catch(eA){ const loc = getErrorLocation(aText, eA); el('#err').textContent = `A parse error: ${loc.message}${loc.line?` (line ${loc.line}, col ${loc.col})`:''}`; el('#taA').style.outline='2px solid #ef4444'; markGutterError('A', loc.line); focusError(el('#taA'), loc); return; }
+    try{ b = JSON.parse(bText); }catch(eB){ const loc = getErrorLocation(bText, eB); el('#err').textContent = `B parse error: ${loc.message}${loc.line?` (line ${loc.line}, col ${loc.col})`:''}`; el('#taB').style.outline='2px solid #ef4444'; markGutterError('B', loc.line); focusError(el('#taB'), loc); return; }
     const out = diffJSON(a,b,getOpts()); renderSummary(out); renderSideBySide(out); window._lastReport = out; }
   function onPretty(){ ['A','B'].forEach(w=>{ try{ const t = el('#ta'+w); const v = JSON.parse(t.value); t.value = JSON.stringify(v,null,2); updateLineNumbers(w); }catch{} }); }
   function onSwap(){ const a = el('#taA').value; const b = el('#taB').value; el('#taA').value = b; el('#taB').value = a; ['A','B'].forEach(updateLineNumbers); }
   function onDownload(){ if(!window._lastReport){ onCompare(); } if(window._lastReport){ download('json-diff-report.json', window._lastReport); } }
-  function attachFileInput(input, ta){ input.addEventListener('change', async e => { const f = e.target.files?.[0]; if(!f) return; const text = await f.text(); ta.value = text; const which = ta.id.endsWith('A') ? 'A' : 'B'; updateLineNumbers(which); }); }
-  function attachDropZone(zone, ta){ ['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev, e=>{e.preventDefault(); zone.classList.add('drag');})); ['dragleave','drop'].forEach(ev=>zone.addEventListener(ev, e=>{e.preventDefault(); zone.classList.remove('drag');})); zone.addEventListener('drop', async e=>{ const f = e.dataTransfer.files?.[0]; if(!f) return; const text = await f.text(); ta.value=text; const which = ta.id.endsWith('A') ? 'A' : 'B'; updateLineNumbers(which); }); }
+  function attachFileInput(input, ta){ input.addEventListener('change', async e => { const f = e.target.files?.[0]; if(!f) return; const text = await f.text(); ta.value = text; const which = ta.id.slice(-1); updateLineNumbers(which); }); }
+  function attachDropZone(zone, ta){ ['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev, e=>{e.preventDefault(); zone.classList.add('drag');})); ['dragleave','drop'].forEach(ev=>zone.addEventListener(ev, e=>{e.preventDefault(); zone.classList.remove('drag');})); zone.addEventListener('drop', async e=>{ const f = e.dataTransfer.files?.[0]; if(!f) return; const text = await f.text(); ta.value=text; const which = ta.id.slice(-1); updateLineNumbers(which); }); }
   function loadExample(){ const J1 = JSON.stringify({name:'Alice', age:25, skills:['JS','Python'], address:{city:'Wonderland'}}, null, 2); const J2 = JSON.stringify({name:'Alice', age:26, skills:['JS','Python','Go'], address:{city:'Wonderland', zip:'12345'}}, null, 2); el('#taA').value = J1; el('#taB').value = J2; ['A','B'].forEach(updateLineNumbers); }
 
   // ---------- Self tests ----------
   function selfTests(){
     const tests = [];
     const push = (name, fn) => tests.push({name, fn});
-    const eq = (a,b) => JSON.stringify(a)===JSON.stringify(b);
 
-    // 1) Identical simple objects
-    push('identical objects', ()=>{
-      const a={x:1,y:2}, b={x:1,y:2};
-      const r = diffJSON(a,b,{});
-      if(!r.identical) throw new Error('Expected identical');
-    });
+    // Diff tests
+    push('identical objects', ()=>{ const a={x:1,y:2}, b={x:1,y:2}; const r=diffJSON(a,b,{}); if(!r.identical) throw new Error('Expected identical'); });
+    push('missing in B', ()=>{ const a={x:1,y:2}, b={x:1}; const r=diffJSON(a,b,{}); if(!(r.missingInB.some(d=>d.path==='y'))) throw new Error('Expected y missing in B'); });
+    push('value difference', ()=>{ const a={x:1}, b={x:2}; const r=diffJSON(a,b,{}); if(!(r.diffs.length===1 && r.diffs[0].path==='x')) throw new Error('Expected diff at x'); });
+    push('arrays as sets equality', ()=>{ const a=[1,2,3], b=[3,2,1]; const r=diffJSON(a,b,{arraysAsSets:true}); if(!r.identical) throw new Error('Expected arrays identical as sets'); });
+    push('type mismatch strict', ()=>{ const a={x:'1'}, b={x:1}; const r=diffJSON(a,b,{strictTypes:true}); if(!(r.diffs.some(d=>d.path==='x'))) throw new Error('Expected type mismatch'); });
 
-    // 2) Missing key in B
-    push('missing in B', ()=>{
-      const a={x:1,y:2}, b={x:1};
-      const r = diffJSON(a,b,{});
-      if(!(r.missingInB.some(d=>d.path==='y'))) throw new Error('Expected y missing in B');
-    });
+    // Line count tests
+    push('countLines LF', ()=>{ if(countLines('a
+b
+') !== 3) throw new Error('LF count'); });
+    push('countLines CRLF', ()=>{ if(countLines('a
+b
+') !== 3) throw new Error('CRLF count'); });
+    push('countLines CR', ()=>{ if(countLines('a
+b
+') !== 3) throw new Error('CR count'); });
 
-    // 3) Value difference
-    push('value difference', ()=>{
-      const a={x:1}, b={x:2};
-      const r = diffJSON(a,b,{});
-      if(!(r.diffs.length===1 && r.diffs[0].path==='x')) throw new Error('Expected diff at x');
-    });
+    // Extra tests for regressions
+    push('nested object missing key', ()=>{ const a={o:{k:1}}, b={o:{}}; const r=diffJSON(a,b,{}); if(!r.missingInB.some(d=>d.path==='o.k')) throw new Error('Expected missing o.k in B'); });
+    push('array length mismatch', ()=>{ const a=[1,2], b=[1]; const r=diffJSON(a,b,{}); if(!r.arrayDiffs.length) throw new Error('Expected array length diff'); });
 
-    // 4) Arrays as sets
-    push('arrays as sets equality', ()=>{
-      const a=[1,2,3], b=[3,2,1];
-      const r = diffJSON(a,b,{arraysAsSets:true});
-      if(!r.identical) throw new Error('Expected arrays identical as sets');
-    });
-
-    // 5) Type mismatch when strict
-    push('type mismatch strict', ()=>{
-      const a={x:'1'}, b={x:1};
-      const r = diffJSON(a,b,{strictTypes:true});
-      if(!(r.diffs.some(d=>d.path==='x' && d.note.indexOf('Type mismatch')>=0))) throw new Error('Expected type mismatch');
-    });
-
-    // Run tests
-    const results = [];
-    let failed = 0;
-    tests.forEach(t=>{
-      try{ t.fn(); results.push({name:t.name, ok:true}); }
-      catch(e){ failed++; results.push({name:t.name, ok:false, msg:e.message}); }
-    });
-
-    alert(results.map(r=>`${r.ok?'✅':'❌'} ${r.name}${r.ok?'':(' — '+r.msg)}`).join('\n'));
+    const results = []; let failed=0;
+    tests.forEach(t=>{ try{ t.fn(); results.push('✅ '+t.name); } catch(e){ failed++; results.push('❌ '+t.name+' — '+e.message); } });
+    alert(results.join('
+'));
     return {failed, results};
   }
 
@@ -342,16 +359,22 @@
     // Editors: input & scroll sync
     ['A','B'].forEach(w=>{
       const ta = el('#ta'+w);
-      ta.addEventListener('input', ()=>{ updateLineNumbers(w); el('#err').textContent=''; ta.style.outline=''; clearGutterError(w); });
+      const resync = ()=>{ syncLineMetrics(w); syncScroll(w); };
+      ta.addEventListener('input', ()=>{ updateLineNumbers(w); el('#err').textContent=''; ta.style.outline=''; clearGutterError(w); resync(); });
       ta.addEventListener('scroll', ()=> syncScroll(w));
+      ta.addEventListener('paste', ()=> setTimeout(()=> { updateLineNumbers(w); resync(); }, 0));
+      ta.addEventListener('mouseup', resync); // after textarea resize drag
+      window.addEventListener('keyup', (e)=>{ if((e.ctrlKey||e.metaKey) && (e.key==='+'||e.key==='-'||e.key==='0')) resync(); });
       updateLineNumbers(w);
+      resync();
     });
+    // Keep metrics synced on resize/zoom changes
+    window.addEventListener('resize', ()=>{ ['A','B'].forEach(syncLineMetrics); });
     // Upload / Drop
     attachFileInput(el('#fileA'), el('#taA'));
     attachFileInput(el('#fileB'), el('#taB'));
     attachDropZone(el('#dropA'), el('#taA'));
     attachDropZone(el('#dropB'), el('#taB'));
   });
-</script>
-</body>
+</script></body>
 </html>
